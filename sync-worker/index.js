@@ -37,10 +37,23 @@ async function syncProdutos(pool) {
   console.log('📦 Iniciando sync de Produtos...');
   try {
     const result = await pool.request().query(`
-      SELECT IdProduto, codProduto, nomeProduto, unid, 
-             precoVenda1, precoVenda2, precoCusto2, 
-             idImagem, codFabr, QtdCaixa 
-      FROM produtos
+      SELECT 
+        p.IdProduto, 
+        p.CODPRODUTO as codProduto, 
+        p.NOMEPRODUTO as nomeProduto, 
+        p.Unid as unid, 
+        p.PrecoVenda1 as precoVenda1, 
+        p.PrecoVenda2 as precoVenda2, 
+        p.CustoCompra2 as precoCusto2, 
+        p.IdImagem1 as idImagem, 
+        p.CodFabr as codFabr,
+        CASE 
+          WHEN pc.FatorConvUnid IS NOT NULL AND pc.FatorConvUnid != 0 
+          THEN (1.0 / pc.FatorConvUnid) 
+          ELSE 1 
+        END AS QtdCaixa
+      FROM Produtos p
+      LEFT JOIN ProdutoConversao pc ON p.IdProduto = pc.IdProduto
     `);
     
     const produtos = result.recordset;
@@ -79,8 +92,16 @@ async function syncEstoque(pool) {
   console.log('📦 Iniciando sync de Estoque...');
   try {
     const result = await pool.request().query(`
-      SELECT IdEstoque, CodFilial, CodLocal, IdProduto, SdoAtual, EstoqueMinimo, LocalArmazenamento 
-      FROM estoque
+      SELECT 
+        e.IdEstoque, 
+        e.CodFilial, 
+        e.CodLocal, 
+        e.IdProduto, 
+        e.EstoqueMinimo, 
+        e.SdoAtual, 
+        e.LocalArmazenamento
+      FROM Estoque e
+      WHERE e.CodLocal IN ('00', '10', '20')
     `);
     
     const estoque = result.recordset;
