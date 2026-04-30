@@ -1,0 +1,16 @@
+{
+  "name": "clipoos-sync-worker",
+  "version": "1.0.0",
+  "description": "Worker isolado para sincronizar MSSQL com Supabase",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.3",
+    "dotenv": "^16.4.5",
+    "mssql": "^10.0.2",
+    "node-cron": "^3.0.3"
+  }
+}
